@@ -8,8 +8,14 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@mediapipe/tasks-vision": "^0.10.14",
+    "axios": "^1.7.2",
+    "babel-eslint": "^10.1.0",
     "core-js": "^3.8.3",
-    "vue": "^3.2.13"
+    "echarts": "^5.5.0",
+    "element-plus": "^2.7.3",
+    "vue": "^3.2.13",
+    "vue-router": "^4.3.2"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
@@ -18,7 +24,7 @@
     "@vue/cli-plugin-eslint": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
     "eslint": "^7.32.0",
-    "eslint-plugin-vue": "^8.0.3"
+    "eslint-plugin-vue": "^8.7.1"
   },
   "eslintConfig": {
     "root": true,
