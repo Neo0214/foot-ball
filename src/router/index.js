@@ -8,12 +8,19 @@ import PageTest from "@/components/pages/Test.vue";
 import PageInfo from "@/components/pages/Info.vue";
 import DataDetail from "@/components/DataDetail.vue";
 import AddPlayer from '@/components/pages/AddPlayer.vue';
+import PageRegister from '@/components/pages/Register.vue'
+import AddTransfer from '@/components/pages/AddTransfer.vue'
 
 const routes=[
     {
         path:'/',
         name:'Login',
         component:PageLogin
+    },
+    {
+        path:'/Register',
+        name:'Register',
+        component:PageRegister,
     },
     {
         path:'/Home',
@@ -39,6 +46,11 @@ const routes=[
         path:'/Data/Details',
         name:'Details',
         component:DataDetail
+    },
+    {
+        path:'/AddTransfer',
+        name:'AddTransfer',
+        component:AddTransfer
     },
     {
         path:'/Test',

@@ -1,28 +1,43 @@
 <template>
   <div>
     <div class="main">
-      <el-card class="login" :body-class="login">
+      <el-card class="register" :body-class="register">
         <div class="mycard">
           <div class="head-line scale-in-hor-center"></div>
           <div class="header">
-            <h1>LOGIN</h1>
+            <h1>REGISTER</h1>
           </div>
           <div class="form">
-            <div style="margin-bottom: 5px;font-size: 20px;">用户名:</div>
-            <el-input v-model="userName" style="height:40px;">
+            <div style="margin-bottom: 5px;font-size: 15px;">用户名:</div>
+            <el-input v-model="user.name" style="height:30px;">
             </el-input>
           </div>
           <div class="form">
-            <div style="font-size: 20px;">密码:</div>
-            <el-input v-model="password" style="height:40px;">
+            <div style="margin-bottom: 5px;font-size: 15px;">邮箱:</div>
+            <el-input v-model="user.email" style="height:30px;">
+            </el-input>
+          </div>
+          <div class="form">
+            <div style="margin-bottom: 5px;font-size: 15px;">电话:</div>
+            <el-input v-model="user.teleNumber" style="height:30px;">
+            </el-input>
+          </div>
+          <div class="form">
+            <div style="margin-bottom: 5px;font-size: 15px;">住址:</div>
+            <el-input v-model="user.address" style="height:30px;">
+            </el-input>
+          </div>
+          <div class="form">
+            <div style="margin-bottom: 5px;font-size: 15px;">密码:</div>
+            <el-input v-model="user.password" style="height:30px;">
             </el-input>
           </div>
           <div class="bottom">
-          <el-button class="btn" type="primary" @click="Login">
-            登录
-          </el-button>
-          <el-text style="margin-top: 10px;position:absolute;right:0;">没有账号？<router-link to="/register">点击注册</router-link></el-text>
+            <el-button class="btn" type="primary" @click="Register">
+              立即注册
+            </el-button>
           </div>
+
         </div>
       </el-card>
     </div>
@@ -30,29 +45,38 @@
 
 </template>
 
+
+
 <script>
 export default {
-  name: 'PageLogin',
+  name: 'PageRegister',
   data() {
     return {
-      userName: '',
-      password: ''
+      user: {
+        name: '',
+        email: '',
+        teleNumber: '',
+        address: '',
+        password: ''
+      }
     }
   },
   methods: {
-    Login() {
-      this.$axios.post('/api/user/login', {
-        userName: this.userName,
-        password: this.password
+    Register() {
+      this.$axios.post('/api/user/register', {
+        name: this.user.name,
+        email: this.user.email,
+        teleNumber: this.user.teleNumber,
+        address: this.user.address,
+        password: this.user.password
       }).then(res => {
-        if (res.data.message == 'success') {
-          localStorage.setItem('id', res.data.id);
-          localStorage.setItem('token', res.data.token);
-          this.$message.success('登录成功')
-          this.$router.push('/home')
+        if (res.data == 'success') {
+          this.$message.success('注册成功')
+          this.$router.go(-1)
         }
         else {
-          this.$message.error('用户名或密码错误')
+          this.$message.error('注册失败')
+          console.log(res.data.message)
         }
       }).catch(err => {
         console.log(err)
@@ -74,9 +98,9 @@ export default {
   background-image: url('@/assets/images/bg.jpg');
 }
 
-.login {
+.register {
   width: 30%;
-  height: 50%;
+  height: 70%;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -87,17 +111,20 @@ export default {
   box-shadow: 4px solid #000000;
 }
 
-.login>>>.el-card__body {
+.register>>>.el-card__body {
   padding: 0;
-  width:80%;
+  width: 80%;
 }
-.bottom{
-  position:relative;
-  width:100%;
+
+.bottom {
+  position: relative;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-top: 3%;
 }
+
 .header {
   width: 100%;
   display: flex;
@@ -105,9 +132,9 @@ export default {
 }
 
 .form {
-  width: 100%;
+  width: 80%;
   padding: 6px;
-  margin: 5% 0%;
+  margin: 1% 0%;
   display: flex;
   flex-direction: column;
 
@@ -121,8 +148,8 @@ export default {
   align-items: center;
 }
 
-.btn{
-  width:30%;
+.btn {
+  width: 30%;
 }
 
 .head-line {

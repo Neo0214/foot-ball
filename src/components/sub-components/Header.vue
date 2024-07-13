@@ -9,7 +9,7 @@
                     <el-menu-item index="1">首页</el-menu-item>
                     <el-menu-item index="2">转会</el-menu-item>
                     <el-menu-item index="3">数据</el-menu-item>
-                    <el-menu-item index="4">联系</el-menu-item>
+                    <el-menu-item index="4">队伍</el-menu-item>
                     <el-menu-item index="5">评测</el-menu-item>
                 </el-menu>
             </div>
@@ -54,6 +54,7 @@ export default {
                 this.$message.error('获取俱乐部信息失败');
                 console.log(err);
             });
+            console.log('head get club logo'+localStorage.getItem('clubId'));
             this.$axios.get('/api/Club/getClubLogo', {
                 params: { clubId: localStorage.getItem('clubId') },
                 responseType: 'blob'

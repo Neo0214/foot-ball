@@ -114,7 +114,7 @@ export default {
                     this.clubName = res.data
                 }).catch(err => { console.log(err) })
 
-
+                console.log('info get club logo'+localStorage.getItem('clubId'));
                 this.$axios.get('/api/club/getClubLogo', {
                     params: { clubId: localStorage.getItem('clubId') },
                     responseType: 'blob'
@@ -229,7 +229,6 @@ export default {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-
 }
 
 .line {
@@ -243,6 +242,7 @@ export default {
     height: 150px;
     border-radius: 50%;
     overflow: hidden;
+    background-color: transparent;
 }
 
 .avatar {

@@ -4,11 +4,19 @@
             <h3>{{ info.name }}</h3>
             <div style="width:5%"></div>
             <h3>{{ info.position }}</h3>
+            <div style="width:5%"></div>
+            <div class="pic-container">
+                <img :src="info.nationPic" alt="nation" class="nation-pic">
+            </div>
         </div>
         <div class="content">
             <div class="left">
-                <div>
+                <div style="margin-bottom: 30px;">
                     <div id="radarChart" style="width:400px;height:400px;" class="radar"></div>
+                </div>
+                <div>
+                    <el-card v-for="item in transferRecord" :key="item.id">
+                        <div>从{{ item.fromName }}转入{{ item.toName }}——{{ item.cost }}万欧</div></el-card>
                 </div>
             </div>
             <div class="middle">
@@ -16,7 +24,12 @@
             </div>
             <div class="right">
             </div>
-            <SubDraw v-if="headOK" text="体能: 68" :startX="headX" :startY="headY" />
+            <SubDraw v-if="headOK" text1="速度: " :text2="radarOption.series[0].data[0].value[0]" :startX="headX[0]" :startY="headY[0]" />
+            <SubDraw v-if="headOK" text1="射门: " :text2="radarOption.series[0].data[0].value[1]" :startX="headX[1]" :startY="headY[1]" />
+            <SubDraw v-if="headOK" text1="传球: " :text2="radarOption.series[0].data[0].value[2]" :startX="headX[2]" :startY="headY[2]" />
+            <SubDraw v-if="headOK" text1="盘带: " :text2="radarOption.series[0].data[0].value[3]" :startX="headX[3]" :startY="headY[3]" />
+            <SubDraw v-if="headOK" text1="防守: " :text2="radarOption.series[0].data[0].value[4]" :startX="headX[4]" :startY="headY[4]" />
+            <SubDraw v-if="headOK" text1="体能: " :text2="radarOption.series[0].data[0].value[5]" :startX="headX[5]" :startY="headY[5]" />
         </div>
     </div>
 </template>
@@ -35,16 +48,25 @@ export default {
         return {
             loadOK: false,
             headOK: false,
-            headX: 0,
-            headY: 0,
+            headX: [],
+            headY: [],
             poseLandmarker: null,
             id: this.$route.query.id,
             imgUrl: '',
             modelOK: false,
+            nationPic: '',
             info: {
-                name: 'Thomas Muller',
-                position: '中锋',
+                name: '',
+                position: '',
+                nation: 1,
             },
+            transferRecord:[
+                {
+                    fromName:'',
+                    toName:'',
+                    cost:0
+                }
+            ],
             radarOption: {
                 color: ['#000000'],
                 legend: {},
@@ -81,7 +103,7 @@ export default {
                         type: 'radar',
                         data: [
                             {
-                                value: [57, 82, 83, 78, 55, 68],
+                                value: [0,0,0,0,0,0],
                                 areaStyle: {
                                     color: 'rgba(255, 255, 255, 1)'
                                 }
@@ -101,6 +123,43 @@ export default {
         }
     },
     mounted() {
+        this.$axios.get('/api/transfer/getAll',{
+            params:{
+                playerId:this.$route.query.id
+            }
+        }).then(res=>{
+            this.transferRecord=res.data.transferRecord;
+        }).catch(err=>{
+            this.$message.error('获取转会记录失败');
+            console.log(err);
+        })
+        // 获取数据展示信息
+        this.$axios.get('/api/player/getDetail',{
+            params:{
+                playerId:this.$route.query.id
+            }
+        }).then(res=>{
+            this.radarOption.series[0].data[0].value=res.data.valueData;
+            const myChart=echarts.init(document.getElementById('radarChart'));
+            myChart.setOption(this.radarOption);
+            this.info.name=res.data.name;
+            this.info.position=res.data.position;
+            this.info.nation=res.data.nation;
+            this.$axios.get('/api/nation/getPic',{
+                params:{
+                    nationId:this.info.nation
+                },
+                responseType:'blob'
+            }).then(res=>{
+                this.info.nationPic=URL.createObjectURL(res.data);
+            }).catch(err=>{
+                this.$message.error('获取国籍图片失败');
+                console.log(err);
+            })
+        }).catch(err=>{
+            this.$message.error('获取球员信息失败');
+            console.log(err);
+        })
         var chartDom = document.getElementById('radarChart');
         var myChart = echarts.init(chartDom);
         myChart.setOption(this.radarOption);
@@ -139,19 +198,31 @@ export default {
             console.log('model OK');
         },
         drawInfos(detections) {
-            const head = detections.landmarks[0][0];
-            console.log(head);
+            // 按照头部、左膝盖、左腰、左肩、左手、左胳膊的顺序
+            console.log(detections.landmarks[0][0]);
+            const bodys = [detections.landmarks[0][0],detections.landmarks[0][25],detections.landmarks[0][23],detections.landmarks[0][11],detections.landmarks[0][15],detections.landmarks[0][13]];
+            
             // 获取图片位置和大小
             const eleImg = document.getElementById('player-pic');
             const imgRect = eleImg.getBoundingClientRect();
             // 获取图片的宽高
             const imgWidth = imgRect.width;
             const imgHeight = imgRect.height;
-            console.log(imgHeight);
             // 调整subDraw的位置，取整数
-            this.headX = Math.round(head.x * imgWidth + imgRect.left);
-            this.headY = Math.round(head.y * imgHeight + imgRect.top);
-            console.log(this.headX, this.headY);
+            this.headX = [
+                Math.round(bodys[0].x * imgWidth + imgRect.left),
+                Math.round(bodys[1].x * imgWidth + imgRect.left),
+                Math.round(bodys[2].x * imgWidth + imgRect.left),
+                Math.round(bodys[3].x * imgWidth + imgRect.left),
+                Math.round(bodys[4].x * imgWidth + imgRect.left),
+                Math.round(bodys[5].x * imgWidth + imgRect.left)];
+            this.headY = [
+                Math.round(bodys[0].y * imgHeight + imgRect.top),
+                Math.round(bodys[1].y * imgHeight + imgRect.top),
+                Math.round(bodys[2].y * imgHeight + imgRect.top),
+                Math.round(bodys[3].y * imgHeight + imgRect.top),
+                Math.round(bodys[4].y * imgHeight + imgRect.top),
+                Math.round(bodys[5].y * imgHeight + imgRect.top)];
             this.headOK = true;
         }
     },
@@ -226,7 +297,7 @@ export default {
     height: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
 }
 
@@ -261,8 +332,8 @@ export default {
 }
 
 .scale-in-hor-right {
-    -webkit-animation: scale-in-hor-right 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
-    animation: scale-in-hor-right 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
+    -webkit-animation: scale-in-hor-right 0.25s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
+    animation: scale-in-hor-right 0.25s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
 }
 
 /**
@@ -304,5 +375,15 @@ export default {
         transform-origin: 100% 100%;
         opacity: 1;
     }
+}
+
+.pic-container{
+    width:auto;
+    height:50%;
+}
+.nation-pic{
+    width:100%;
+    height:100%;
+    object-fit: cover;
 }
 </style>

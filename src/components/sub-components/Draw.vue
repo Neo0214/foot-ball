@@ -6,7 +6,7 @@
             </div>
         </div>
         <div class="right scale-in-hor-left">
-            <div class="text tracking-in-contract-bck-bottom">{{ text }}</div>
+            <div class="text tracking-in-contract-bck-bottom">{{text1}}{{ text2 }}</div>
             <div class="line">
 
             </div>
@@ -30,9 +30,13 @@ export default {
             type: Number,
             default: 0
         },
-        text: {
+        text1: {
             type: String,
             default: ''
+        },
+        text2:{
+            type:String,
+            default:''
         }
     },
     data() {
